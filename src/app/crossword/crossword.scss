@@ -1,0 +1,182 @@
+:host { display: block; min-height: 100dvh; }
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background: rgba(255, 253, 252, 0.9);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1px 0 var(--line);
+}
+.topbar h2 { margin: 0; font-size: 22px; color: var(--rose-deep); }
+.zoom { display: flex; gap: 8px; }
+.zoom button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  font-size: 20px;
+  background: var(--rose-soft);
+  color: var(--rose-deep);
+}
+
+.stage { padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+.viewport {
+  width: 100%;
+  max-height: 64vh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  background: var(--paper);
+  border: 1px solid var(--rose-softer);
+  border-radius: 20px;
+  padding: 18px;
+}
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-auto-rows: var(--cell);
+  width: max-content;
+  margin: 0 auto;
+}
+
+.cell {
+  position: relative;
+  width: var(--cell);
+  height: var(--cell);
+  border: 1px solid var(--line);
+}
+.cell.empty { background: var(--bg-2); border-color: transparent; }
+
+/* --- pole na literę --- */
+.cell.letter { background: #fff; }
+.cell.letter input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ink);
+  outline: none;
+  padding: 0;
+  caret-color: var(--rose);
+}
+.cell.letter.in-entry { background: var(--rose-softer); }
+.cell.letter.active { background: var(--rose-soft); }
+.cell.letter.wrong input { color: #c0567a; }
+.cell .secret-n {
+  position: absolute;
+  top: 1px;
+  left: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gold-ink);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* --- pole z pytaniem (definicja) --- */
+.cell.clue {
+  background: var(--rose-softer);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+.clue-part {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 3px;
+  overflow: hidden;
+}
+.cell.clue.two .clue-part + .clue-part { border-top: 1px solid var(--line); }
+.clue-text {
+  font-size: 8px;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--ink);
+  word-break: break-word;
+}
+.arrow {
+  position: absolute;
+  color: var(--rose-deep);
+  font-size: 9px;
+  line-height: 1;
+}
+.clue-part.dir-right .arrow { right: 0; top: 50%; transform: translate(40%, -50%); }
+.clue-part.dir-down .arrow { bottom: 0; left: 50%; transform: translate(-50%, 40%); }
+
+/* --- pasek hasła --- */
+.secret { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.secret-label {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  color: var(--rose-deep);
+  letter-spacing: 2px;
+}
+.secret-bar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.secret-box {
+  position: relative;
+  width: 34px;
+  height: 40px;
+  border: 1.5px solid var(--gold-line);
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+}
+.secret-box.filled { background: var(--gold-bg); }
+.secret-box .box-n {
+  position: absolute;
+  bottom: -16px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.actions { display: flex; gap: 12px; padding: 0 22px 28px; max-width: 520px; margin: 0 auto; width: 100%; }
+.actions .check { flex: 1; padding: 14px; font-size: 16px; }
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(76, 66, 74, 0.5);
+  z-index: 20;
+}
+.success {
+  width: min(380px, 100%);
+  background: var(--paper);
+  border-radius: 26px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+  animation: pop 0.35s ease;
+}
+@keyframes pop {
+  from { transform: scale(0.86); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.success .crown { font-size: 52px; }
+.success h1 { margin: 8px 0; font-size: 34px; color: var(--rose-deep); }
+.reveal { font-size: 20px; margin-top: 18px; }
+.reveal strong { color: var(--rose); letter-spacing: 3px; }
+.success button { margin-top: 24px; width: 100%; padding: 14px; }

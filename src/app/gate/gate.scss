@@ -1,0 +1,42 @@
+:host { display: block; }
+
+.gate {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(360px, 100%);
+  background: var(--paper);
+  border-radius: 26px;
+  padding: 38px 30px;
+  text-align: center;
+  border: 1px solid var(--rose-softer);
+  box-shadow: 0 24px 60px rgba(120, 80, 100, 0.16);
+}
+
+.crown { font-size: 40px; opacity: 0.9; }
+
+h1 { margin: 10px 0 4px; font-size: 30px; color: var(--rose-deep); }
+.sub { margin: 0 0 24px; color: var(--muted); }
+
+input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 18px;
+  text-align: center;
+  padding: 14px 16px;
+  border: 1.5px solid var(--rose-soft);
+  border-radius: 16px;
+  outline: none;
+  margin-bottom: 16px;
+  color: var(--ink);
+  background: #fff;
+}
+input:focus { border-color: var(--rose); }
+
+button { width: 100%; padding: 14px; font-size: 16px; }
+
+.err { color: #c0567a; margin: 16px 0 0; font-weight: 600; }

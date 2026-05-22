@@ -1,0 +1,49 @@
+import { Board } from './board';
+
+// PLIK WYGENEROWANY przez tools/generate-board.mjs — możesz edytować ręcznie.
+// Krzyżówka szwedzka: pytanie w kratce + strzałka (right/down); pola hasła na dole.
+
+export const BOARDS: Board[] = [
+  {
+    id: 'board1',
+    title: 'Plansza nr 1',
+    rows: 13,
+    cols: 18,
+    secret: 'KSIĘŻNICZKA',
+    clues: [
+      { at: [3, 5], dir: 'right', answer: 'SYCYLIA', text: 'Wyspa obok Malty' },
+      { at: [2, 6], dir: 'down', answer: 'SANTORINI', text: 'Grecka wyspa' },
+      { at: [8, 3], dir: 'right', answer: 'FERRARI', text: 'Koń z Maranello' },
+      { at: [4, 10], dir: 'down', answer: 'CUKIER', text: 'C₁₂H₂₂O₁₁' },
+      { at: [7, 9], dir: 'right', answer: 'KOMPAS', text: 'Wskazuje północ' },
+      { at: [10, 8], dir: 'right', answer: 'KRETA', text: 'Wyspa Zeusa' },
+      { at: [6, 4], dir: 'right', answer: 'ATOM', text: 'Najmniejszy kawałek pierwiastka' },
+      { at: [6, 12], dir: 'down', answer: 'MALTA', text: 'Wyspa Rafiego' },
+      { at: [5, 14], dir: 'down', answer: 'ZARA', text: 'Hiszpańska sieciówka' },
+      { at: [10, 0], dir: 'right', answer: 'SEKWANA', text: 'Rzeka Paryża' },
+      { at: [9, 13], dir: 'right', answer: 'AZOT', text: '78% powietrza' },
+      { at: [4, 0], dir: 'right', answer: 'KOMETA', text: 'Z warkoczem na niebie' },
+      { at: [0, 1], dir: 'down', answer: 'WULKAN', text: 'Etna albo ten z Teneryfy' },
+      { at: [0, 12], dir: 'down', answer: 'TIARA', text: 'Diadem księżniczki' },
+      { at: [4, 11], dir: 'right', answer: 'RAFI', text: 'Maltańczyk' },
+      { at: [6, 2], dir: 'down', answer: 'HELENA', text: 'Imię lalek z Kosiny' },
+      { at: [5, 17], dir: 'down', answer: 'TIKTOK', text: 'Zegar albo aplikacja' },
+      { at: [1, 3], dir: 'down', answer: 'ZAMEK', text: 'Z wieżą i fosą' },
+      { at: [1, 5], dir: 'right', answer: 'DIAMENT', text: 'Na pierścionku' },
+      { at: [2, 15], dir: 'down', answer: 'NIL', text: 'Najdłuższa rzeka świata' },
+    ],
+    secretCells: [
+      { n: 1, at: [7, 10] },
+      { n: 2, at: [3, 6] },
+      { n: 3, at: [9, 6] },
+      { n: 4, at: [8, 5] },
+      { n: 5, at: [6, 14] },
+      { n: 6, at: [6, 1] },
+      { n: 7, at: [2, 12] },
+      { n: 8, at: [3, 8] },
+      { n: 9, at: [9, 15] },
+      { n: 10, at: [10, 9] },
+      { n: 11, at: [7, 14] },
+    ],
+  },
+];

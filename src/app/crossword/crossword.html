@@ -1,0 +1,85 @@
+<header class="topbar">
+  <h2>{{ message() || board.title }}</h2>
+  <div class="zoom">
+    <button type="button" (click)="zoomOut()" aria-label="Pomniejsz">−</button>
+    <button type="button" (click)="fit()" aria-label="Dopasuj">⤢</button>
+    <button type="button" (click)="zoomIn()" aria-label="Powiększ">+</button>
+  </div>
+</header>
+
+<div class="stage">
+  <div class="viewport" #viewportEl>
+    <div class="board" #boardEl [style.zoom]="zoom()" [style.--cols]="board.cols">
+      @for (row of grid; track $index; let r = $index) {
+        @for (cell of row; track $index; let c = $index) {
+          @if (!cell) {
+            <div class="cell empty"></div>
+          } @else if (cell.kind === 'clue') {
+            <div class="cell clue" [class.two]="cell.clues.length > 1" (click)="onClueClick(cell)">
+              @for (cl of cell.clues; track $index) {
+                <div class="clue-part" [class.dir-down]="cl.dir === 'down'" [class.dir-right]="cl.dir === 'right'">
+                  <span class="clue-text">{{ cl.text }}</span>
+                  <span class="arrow">{{ arrowGlyph(cl.dir) }}</span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div
+              class="cell letter"
+              [class.active]="isActive(r, c)"
+              [class.in-entry]="isInEntry(r, c)"
+              [class.wrong]="isWrong(r, c)"
+            >
+              @if (cell.secretN !== null) {
+                <span class="secret-n">{{ cell.secretN }}</span>
+              }
+              <input
+                type="text"
+                maxlength="1"
+                autocomplete="off"
+                autocapitalize="characters"
+                spellcheck="false"
+                [attr.data-key]="r + ',' + c"
+                [value]="val(r, c)"
+                (input)="onInput($event, r, c)"
+                (keydown)="onKeydown($event, r, c)"
+                (focus)="onFocus(r, c)"
+                (pointerdown)="onPointerDown(r, c)"
+                (click)="onClick(r, c)"
+              />
+            </div>
+          }
+        }
+      }
+    </div>
+  </div>
+
+  <div class="secret">
+    <span class="secret-label">Hasło</span>
+    <div class="secret-bar">
+      @for (b of secretBoxes(); track b.n) {
+        <div class="secret-box" [class.filled]="b.letter">
+          <span class="box-letter">{{ b.letter }}</span>
+          <span class="box-n">{{ b.n }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<div class="actions">
+  <button type="button" class="check" (click)="check()">Sprawdź</button>
+  <button type="button" class="ghost" (click)="clear()">Wyczyść</button>
+</div>
+
+@if (solved()) {
+  <div class="overlay">
+    <div class="success">
+      <div class="crown">👑</div>
+      <h1>Brawo!</h1>
+      <p>Rozwiązałaś krzyżówkę.</p>
+      <p class="reveal">Hasło: <strong>{{ board.secret }}</strong></p>
+      <button type="button" (click)="closeSuccess()">Zamknij</button>
+    </div>
+  </div>
+}
