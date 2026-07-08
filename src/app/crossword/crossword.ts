@@ -32,6 +32,7 @@ export class Crossword implements AfterViewInit {
   private wasActive = false;
   private resetClicks = 0;
   private resetTimer: ReturnType<typeof setTimeout> | null = null;
+  private pinch: { dist: number; zoom: number } | null = null;
   private lastClueKey: string | null = null;
   private lastClueIdx = 0;
   private flashTimer: ReturnType<typeof setTimeout> | null = null;
@@ -306,6 +307,44 @@ export class Crossword implements AfterViewInit {
     this.message.set(msg);
     if (this.flashTimer) clearTimeout(this.flashTimer);
     this.flashTimer = setTimeout(() => this.message.set(''), 2500);
+  }
+
+  // ---------- pinch-zoom dwoma palcami na planszy ----------
+  onTouchStart(ev: TouchEvent): void {
+    if (ev.touches.length === 2) {
+      this.pinch = { dist: this.touchDist(ev), zoom: this.zoom() };
+    }
+  }
+
+  onTouchMove(ev: TouchEvent): void {
+    if (!this.pinch || ev.touches.length !== 2) return;
+    ev.preventDefault();
+    const vp = this.viewportEl()?.nativeElement;
+    const oldZoom = this.zoom();
+    const next = Math.min(
+      MAX_ZOOM,
+      Math.max(MIN_ZOOM, this.pinch.zoom * (this.touchDist(ev) / this.pinch.dist)),
+    );
+    if (!vp || next === oldZoom) return;
+    // skaluj wokół punktu między palcami, żeby plansza nie "uciekała"
+    const rect = vp.getBoundingClientRect();
+    const mx = (ev.touches[0].clientX + ev.touches[1].clientX) / 2 - rect.left;
+    const my = (ev.touches[0].clientY + ev.touches[1].clientY) / 2 - rect.top;
+    const cx = (vp.scrollLeft + mx) / oldZoom;
+    const cy = (vp.scrollTop + my) / oldZoom;
+    this.zoom.set(next);
+    vp.scrollLeft = cx * next - mx;
+    vp.scrollTop = cy * next - my;
+  }
+
+  onTouchEnd(ev: TouchEvent): void {
+    if (ev.touches.length < 2) this.pinch = null;
+  }
+
+  private touchDist(ev: TouchEvent): number {
+    const a = ev.touches[0];
+    const b = ev.touches[1];
+    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
   }
 
   // ---------- zoom (pan = natywne przewijanie viewportu) ----------

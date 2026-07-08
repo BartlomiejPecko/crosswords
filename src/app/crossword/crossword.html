@@ -8,7 +8,14 @@
 </header>
 
 <div class="stage">
-  <div class="viewport" #viewportEl>
+  <div
+    class="viewport"
+    #viewportEl
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd($event)"
+    (touchcancel)="onTouchEnd($event)"
+  >
     <div class="board" #boardEl [style.zoom]="zoom()" [style.--cols]="board.cols">
       @for (row of grid; track $index; let r = $index) {
         @for (cell of row; track $index; let c = $index) {
