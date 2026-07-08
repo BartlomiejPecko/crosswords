@@ -1,5 +1,5 @@
 <header class="topbar">
-  <h2>{{ message() || board.title }}</h2>
+  <h2 (click)="onTitleClick()">{{ message() || board.title }}</h2>
   <div class="zoom">
     <button type="button" (click)="zoomOut()" aria-label="Pomniejsz">−</button>
     <button type="button" (click)="fit()" aria-label="Dopasuj">⤢</button>

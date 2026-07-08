@@ -30,6 +30,8 @@ export class Crossword implements AfterViewInit {
   private readonly viewportEl = viewChild<ElementRef<HTMLDivElement>>('viewportEl');
 
   private wasActive = false;
+  private resetClicks = 0;
+  private resetTimer: ReturnType<typeof setTimeout> | null = null;
   private lastClueKey: string | null = null;
   private lastClueIdx = 0;
   private flashTimer: ReturnType<typeof setTimeout> | null = null;
@@ -280,6 +282,20 @@ export class Crossword implements AfterViewInit {
     this.inputs.set({});
     this.wrong.set(new Set());
     localStorage.removeItem(this.storageKey);
+  }
+
+  // ukryty reset do testów: 5 szybkich kliknięć w tytuł czyści postęp i blokuje bramkę
+  onTitleClick(): void {
+    this.resetClicks++;
+    if (this.resetTimer) clearTimeout(this.resetTimer);
+    if (this.resetClicks >= 5) {
+      localStorage.removeItem(this.storageKey);
+      localStorage.removeItem('kk_unlocked');
+      location.reload();
+      return;
+    }
+    if (this.resetClicks >= 3) this.flash(`Reset za ${5 - this.resetClicks}…`);
+    this.resetTimer = setTimeout(() => (this.resetClicks = 0), 1500);
   }
 
   closeSuccess(): void {
