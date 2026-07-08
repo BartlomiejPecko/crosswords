@@ -1,5 +1,17 @@
 <header class="topbar">
   <h2 (click)="onTitleClick()">{{ message() || board.title }}</h2>
+  <div class="tabs">
+    @for (b of boards; track b.id; let i = $index) {
+      <button
+        type="button"
+        [class.on]="b === board"
+        (click)="selectBoard(i)"
+        [attr.aria-label]="b.title"
+      >
+        {{ isUnlocked(b) ? i + 1 : '🔒' }}
+      </button>
+    }
+  </div>
   <div class="zoom">
     <button type="button" (click)="zoomOut()" aria-label="Pomniejsz">−</button>
     <button type="button" (click)="fit()" aria-label="Dopasuj">⤢</button>
@@ -86,6 +98,9 @@
       <h1>Brawo!</h1>
       <p>Rozwiązałaś krzyżówkę.</p>
       <p class="reveal">Hasło: <strong>{{ board.secret }}</strong></p>
+      @if (hasNextLockedBoard()) {
+        <p class="hint">Psst… to hasło otwiera kolejną planszę 🔒</p>
+      }
       <button type="button" (click)="closeSuccess()">Zamknij</button>
     </div>
   </div>

@@ -1,35 +1,73 @@
 // Generator krzyżówki szwedzkiej z losowymi restartami.
 // Próbuje wielu kolejności słów i wybiera układ, który zmieści WSZYSTKIE słowa
-// w najmniejszej siatce oraz pozwoli ułożyć hasło KSIEZNICZKA.
-// Weryfikuje spójność i zapisuje src/app/boards.ts.
-
-import { writeFileSync } from 'node:fs';
+// w najmniejszej siatce oraz pozwoli ułożyć hasło.
+// Użycie: node tools/generate-board.mjs [board1|board2]
+// Wypisuje gotowy obiekt planszy do wklejenia w src/app/boards.ts.
 
 // [odpowiedź (BEZ OGONKÓW), treść pytania (krótko, kreatywnie)]
-const WORDS = [
-  ['KRETA', 'Wyspa Zeusa'],
-  ['SANTORINI', 'Grecka wyspa'],
-  ['MALTA', 'Wyspa Rafiego'],
-  ['SYCYLIA', 'Wyspa obok Malty'],
-  ['NIL', 'Najdłuższa rzeka świata'],
-  ['SEKWANA', 'Rzeka Paryża'],
-  ['WULKAN', 'Etna albo ten z Teneryfy'],
-  ['KOMPAS', 'Wskazuje północ'],
-  ['ATOM', 'Najmniejszy kawałek pierwiastka'],
-  ['CUKIER', 'C₁₂H₂₂O₁₁'],
-  ['AZOT', '78% powietrza'],
-  ['KOMETA', 'Z warkoczem na niebie'],
-  ['TIKTOK', 'Zegar albo aplikacja'],
-  ['ZARA', 'Hiszpańska sieciówka'],
-  ['FERRARI', 'Koń z Maranello'],
-  ['TIARA', 'Diadem księżniczki'],
-  ['ZAMEK', 'Z wieżą i fosą'],
-  ['DIAMENT', 'Na pierścionku'],
-  ['RAFI', 'Maltańczyk'],
-  ['HELENA', 'Imię lalek z Kosiny'],
-];
+const CONFIGS = {
+  board1: {
+    seed: 20260522,
+    secret: 'KSIEZNICZKA',
+    words: [
+      ['KRETA', 'Wyspa Zeusa'],
+      ['SANTORINI', 'Grecka wyspa'],
+      ['MALTA', 'Wyspa Rafiego'],
+      ['SYCYLIA', 'Wyspa obok Malty'],
+      ['NIL', 'Najdłuższa rzeka świata'],
+      ['SEKWANA', 'Rzeka Paryża'],
+      ['WULKAN', 'Etna albo ten z Teneryfy'],
+      ['KOMPAS', 'Wskazuje północ'],
+      ['ATOM', 'Najmniejszy kawałek pierwiastka'],
+      ['CUKIER', 'C₁₂H₂₂O₁₁'],
+      ['AZOT', '78% powietrza'],
+      ['KOMETA', 'Z warkoczem na niebie'],
+      ['TIKTOK', 'Zegar albo aplikacja'],
+      ['ZARA', 'Hiszpańska sieciówka'],
+      ['FERRARI', 'Koń z Maranello'],
+      ['TIARA', 'Diadem księżniczki'],
+      ['ZAMEK', 'Z wieżą i fosą'],
+      ['DIAMENT', 'Na pierścionku'],
+      ['RAFI', 'Maltańczyk'],
+      ['HELENA', 'Imię lalek z Kosiny'],
+    ],
+  },
+  board2: {
+    seed: 20260708,
+    secret: 'VALLETTA',
+    words: [
+      ['VADUZ', 'Stolica Liechtensteinu'],
+      ['EVEREST', 'Dach świata'],
+      ['ETNA', 'Sycylijski wulkan'],
+      ['TYBER', 'Rzeka Rzymu'],
+      ['LIZBONA', 'Stolica z tramwajem 28'],
+      ['BALTYK', 'Nasze morze'],
+      ['ATLANTYK', 'Ocean po drodze do Ameryki'],
+      ['GOZO', 'Mała siostra Malty'],
+      ['TALLIN', 'Stolica Estonii'],
+      ['WENECJA', 'Miasto gondoli'],
+      ['LOARA', 'Francuska rzeka zamków'],
+      ['SAHARA', 'Piaski bez końca'],
+      ['ANDY', 'Góry z lamami'],
+      ['TATRY', 'Góry z Giewontem'],
+      ['MDINA', 'Cicha stolica Malty'],
+      ['PARYZ', 'Miasto zakochanych'],
+      ['RODOS', 'Wyspa kolosa'],
+      ['KORSYKA', 'Wyspa Napoleona'],
+      ['KRAKOW', 'Miasto smoka wawelskiego'],
+      ['FIORD', 'Norweska zatoka'],
+    ],
+  },
+};
 
-const SECRET = 'KSIEZNICZKA';
+const NAME = process.argv[2] || 'board2';
+const CONFIG = CONFIGS[NAME];
+if (!CONFIG) {
+  console.error('Nieznana plansza:', NAME);
+  process.exit(1);
+}
+const WORDS = CONFIG.words;
+const SECRET = CONFIG.secret;
 const K = (r, c) => r + ',' + c;
 
 function mulberry32(a) {
@@ -128,7 +166,7 @@ function secretFeasible(letters) {
 }
 
 // --- losowe restarty: wybierz najlepszy układ ---
-const rng = mulberry32(20260522);
+const rng = mulberry32(CONFIG.seed);
 let best = null;
 for (let t = 0; t < 3000; t++) {
   const order = [...WORDS];
@@ -158,7 +196,7 @@ const clues = placements.map((p) => {
   return { at: [ar, ac], dir: p.dir === 'across' ? 'right' : 'down', answer: p.answer, text: p.clue };
 });
 
-// --- wybór 11 pól na hasło, rozproszone po różnych słowach ---
+// --- wybór pól na hasło, rozproszone po różnych słowach ---
 const cellWord = new Map();
 for (const p of placements) {
   const dr = p.dir === 'down' ? 1 : 0;
@@ -213,29 +251,20 @@ console.log(`\nSiatka ${rows}x${cols}, słów: ${placements.length}/${WORDS.leng
 console.log(grid.map((row) => row.join(' ')).join('\n'));
 console.log('\nHasło =', SECRET, '| pola (małe litery) rozproszone po słowach');
 
-// --- zapis boards.ts ---
+// --- wypisz obiekt planszy do wklejenia w boards.ts ---
 const fmtClues = clues.map((c) => `      { at: [${c.at[0]}, ${c.at[1]}], dir: '${c.dir}', answer: '${c.answer}', text: '${c.text.replace(/'/g, "\\'")}' },`).join('\n');
 const fmtSecret = secretCells.map((s) => `      { n: ${s.n}, at: [${s.at[0]}, ${s.at[1]}] },`).join('\n');
-const out = `import { Board } from './board';
-
-// PLIK WYGENEROWANY przez tools/generate-board.mjs — możesz edytować ręcznie.
-// Krzyżówka szwedzka: pytanie w kratce + strzałka (right/down); pola hasła na dole.
-
-export const BOARDS: Board[] = [
+console.log(`\n  // --- do wklejenia w src/app/boards.ts ---
   {
-    id: 'board1',
-    title: 'Plansza nr 1',
+    id: '${NAME}',
+    title: 'Plansza nr ${NAME.replace('board', '')}',
     rows: ${rows},
     cols: ${cols},
-    secret: 'KSIĘŻNICZKA',
+    secret: '${SECRET}',
     clues: [
 ${fmtClues}
     ],
     secretCells: [
 ${fmtSecret}
     ],
-  },
-];
-`;
-writeFileSync(new URL('../src/app/boards.ts', import.meta.url), out);
-console.log('\nZapisano src/app/boards.ts');
+  },`);

@@ -24,6 +24,7 @@ export interface Board {
   rows: number;
   cols: number;
   secret: string; // ładna forma hasła do pokazania (np. "KSIĘŻNICZKA")
+  unlockWith?: string; // hasło otwierające planszę (znormalizowane, bez ogonków)
   clues: ClueDef[];
   secretCells: SecretCellDef[];
 }

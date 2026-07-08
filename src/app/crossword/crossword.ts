@@ -14,9 +14,10 @@ const ZOOM_STEP = 0.2;
   styleUrl: './crossword.scss',
 })
 export class Crossword implements AfterViewInit {
-  readonly board: Board = BOARDS[0];
-  readonly grid: (Cell | null)[][];
-  private readonly entries: Entry[];
+  readonly boards = BOARDS;
+  board: Board = BOARDS[0];
+  grid: (Cell | null)[][] = [];
+  private entries: Entry[] = [];
 
   readonly inputs = signal<Record<string, string>>({});
   readonly current = signal<{ row: number; col: number } | null>(null);
@@ -36,18 +37,65 @@ export class Crossword implements AfterViewInit {
   private lastClueKey: string | null = null;
   private lastClueIdx = 0;
   private flashTimer: ReturnType<typeof setTimeout> | null = null;
-  private readonly storageKey: string;
+  private storageKey = '';
 
   constructor() {
-    const model = buildModel(this.board);
-    this.grid = model.grid;
-    this.entries = model.entries;
-    this.storageKey = 'kk_progress_' + this.board.id;
-    this.load();
+    const saved = localStorage.getItem('kk_board');
+    const idx = this.boards.findIndex((b) => b.id === saved);
+    this.setBoard(idx >= 0 && this.isUnlocked(this.boards[idx]) ? idx : 0);
   }
 
   ngAfterViewInit(): void {
     setTimeout(() => this.fit(), 0);
+  }
+
+  // ---------- wybór planszy ----------
+  isUnlocked(b: Board): boolean {
+    return !b.unlockWith || localStorage.getItem('kk_unlock_' + b.id) === '1';
+  }
+
+  private static normalize(text: string): string {
+    return text
+      .toUpperCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/Ł/g, 'L')
+      .trim();
+  }
+
+  selectBoard(i: number): void {
+    const b = this.boards[i];
+    if (!b || b === this.board) return;
+    if (!this.isUnlocked(b)) {
+      const input = prompt('Ta plansza jest zamknięta 🔒\nWpisz hasło z planszy nr 1:');
+      if (input === null) return;
+      if (Crossword.normalize(input) !== b.unlockWith) {
+        this.flash('Niepoprawne hasło');
+        return;
+      }
+      localStorage.setItem('kk_unlock_' + b.id, '1');
+    }
+    this.setBoard(i);
+    localStorage.setItem('kk_board', b.id);
+    setTimeout(() => this.fit(), 0);
+  }
+
+  private setBoard(i: number): void {
+    this.board = this.boards[i];
+    const model = buildModel(this.board);
+    this.grid = model.grid;
+    this.entries = model.entries;
+    this.storageKey = 'kk_progress_' + this.board.id;
+    this.current.set(null);
+    this.wrong.set(new Set());
+    this.solved.set(false);
+    this.message.set('');
+    this.lastClueKey = null;
+    this.load();
+  }
+
+  hasNextLockedBoard(): boolean {
+    return this.boards.some((b) => !this.isUnlocked(b));
   }
 
   // ---------- pomocnicze ----------
@@ -290,7 +338,11 @@ export class Crossword implements AfterViewInit {
     this.resetClicks++;
     if (this.resetTimer) clearTimeout(this.resetTimer);
     if (this.resetClicks >= 5) {
-      localStorage.removeItem(this.storageKey);
+      for (const b of this.boards) {
+        localStorage.removeItem('kk_progress_' + b.id);
+        localStorage.removeItem('kk_unlock_' + b.id);
+      }
+      localStorage.removeItem('kk_board');
       localStorage.removeItem('kk_unlocked');
       location.reload();
       return;
