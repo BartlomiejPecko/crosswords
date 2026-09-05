@@ -10,7 +10,9 @@
             <span class="art-heart">♡</span>
           </div>
           <div class="card-copy">
-            <span class="availability">{{ isUnlocked(b) ? 'GOTOWA DO ODKRYCIA' : 'JESZCZE CHWILKA' }}</span>
+            @if (isUnlocked(b)) {
+              <span class="availability">GOTOWA DO ODKRYCIA</span>
+            }
             <h2>{{ b.title }}</h2>
             <p>{{ b.clues.length }} haseł · krzyżówka szwedzka</p>
             <span class="card-cta">{{ isUnlocked(b) ? 'Otwórz krzyżówkę' : 'Odblokuj hasłem z pierwszej' }} <span aria-hidden="true">↗</span></span>
