@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, HostListener, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
+import { AuthService } from '../auth';
 import { ArrowDir, Board, Cell, Entry } from '../board';
 import { BOARDS } from '../boards';
 import { buildModel } from '../engine';
@@ -14,6 +15,10 @@ const ZOOM_STEP = 0.2;
   styleUrl: './crossword.scss',
 })
 export class Crossword implements AfterViewInit {
+  readonly auth = inject(AuthService);
+  readonly choosing = signal(true);
+  readonly pendingBoard = signal<number | null>(null);
+  readonly unlockError = signal('');
   readonly boards = BOARDS;
   board: Board = BOARDS[0];
   grid: (Cell | null)[][] = [];
@@ -65,19 +70,32 @@ export class Crossword implements AfterViewInit {
 
   selectBoard(i: number): void {
     const b = this.boards[i];
-    if (!b || b === this.board) return;
+    if (!b) return;
     if (!this.isUnlocked(b)) {
-      const input = prompt('Ta plansza jest zamknięta 🔒\nWpisz hasło z planszy nr 1:');
-      if (input === null) return;
-      if (Crossword.normalize(input) !== b.unlockWith) {
-        this.flash('Niepoprawne hasło');
-        return;
-      }
-      localStorage.setItem('kk_unlock_' + b.id, '1');
+      this.pendingBoard.set(i);
+      this.unlockError.set('');
+      this.choosing.set(true);
+      setTimeout(() => document.getElementById('board-password')?.focus(), 0);
+      return;
     }
+    this.pendingBoard.set(null);
     this.setBoard(i);
+    this.choosing.set(false);
     localStorage.setItem('kk_board', b.id);
     setTimeout(() => this.fit(), 0);
+  }
+
+  unlockBoard(event: Event, password: string): void {
+    event.preventDefault();
+    const i = this.pendingBoard();
+    if (i === null) return;
+    const b = this.boards[i];
+    if (Crossword.normalize(password) !== b.unlockWith) {
+      this.unlockError.set('Niepoprawne hasło');
+      return;
+    }
+    localStorage.setItem('kk_unlock_' + b.id, '1');
+    this.selectBoard(i);
   }
 
   private setBoard(i: number): void {
@@ -410,9 +428,10 @@ export class Crossword implements AfterViewInit {
   fit(): void {
     const vp = this.viewportEl()?.nativeElement;
     if (!vp) return;
-    const cellPx = 47;
+    const cellPx = parseFloat(getComputedStyle(vp).getPropertyValue('--cell')) || 42;
     const natural = this.board.cols * cellPx;
     const avail = vp.clientWidth - 36;
-    this.zoom.set(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, avail / natural)));
+    const heightZoom = (vp.clientHeight - 36) / (this.board.rows * cellPx);
+    this.zoom.set(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.min(avail / natural, heightZoom))));
   }
 }

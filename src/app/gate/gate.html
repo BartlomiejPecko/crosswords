@@ -1,18 +1,21 @@
-<div class="gate">
-  <form class="card" autocomplete="off" (submit)="submit($event, pw.value)">
-    <div class="crown">👑</div>
-    <input
-      #pw
-      type="password"
-      inputmode="text"
-      placeholder="hasło"
-      autocomplete="off"
-      autofocus
-      (input)="error.set(false)"
-    />
-    <button type="submit">Wejdź</button>
-    @if (error()) {
-      <p class="err">Niepoprawne hasło</p>
-    }
-  </form>
-</div>
+<main class="gate">
+  <section class="lock-screen" aria-labelledby="gate-title">
+    <h1 id="gate-title">Hej, księżniczko</h1>
+    <div class="pin-dots" role="status" [attr.aria-label]="'Wpisano ' + pin().length + ' z 4 cyfr'">
+      @for (dot of [0, 1, 2, 3]; track dot) {
+        <span [class.filled]="pin().length > dot"></span>
+      }
+    </div>
+    <p class="error" aria-live="polite">{{ error() }}</p>
+    <div class="keypad" aria-label="Klawiatura kodu PIN">
+      @for (digit of digits; track digit; let i = $index) {
+        <button type="button" class="digit" (click)="press(digit)" [disabled]="busy()" [attr.aria-label]="digit">
+          <span>{{ digit }}</span><small aria-hidden="true">{{ letters[i] || ' ' }}</small>
+        </button>
+      }
+      <span></span>
+      <button type="button" class="digit" (click)="press('0')" [disabled]="busy()" aria-label="0">0</button>
+      <button type="button" class="delete" (click)="erase()" [disabled]="busy() || !pin().length" aria-label="Usuń ostatnią cyfrę">⌫</button>
+    </div>
+  </section>
+</main>

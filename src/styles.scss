@@ -1,14 +1,14 @@
 /* Globalny motyw — stonowany, księżniczkowy (przygaszony, zakurzony róż). */
 :root {
-  --bg-1: #faf3f1;
-  --bg-2: #f2edf1;
+  --bg-1: #fff5f8;
+  --bg-2: #f6e4ed;
   --paper: #fffdfc;
   --rose: #c08aa0;
-  --rose-deep: #a76f87;
+  --rose-deep: #965570;
   --rose-soft: #efdde4;
   --rose-softer: #f8eef2;
   --ink: #4c424a;
-  --muted: #8a7d85;
+  --muted: #806674;
   --line: #e7dce0;
   --gold-bg: #f4ecd9;
   --gold-line: #d9c79c;
@@ -46,6 +46,7 @@ button {
 }
 button:hover { filter: brightness(1.04); }
 button:active { transform: scale(0.97); }
+button:focus-visible { outline: 3px solid var(--rose-deep); outline-offset: 4px; }
 button.ghost {
   background: #fff;
   color: var(--rose-deep);

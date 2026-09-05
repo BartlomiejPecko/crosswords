@@ -33,29 +33,20 @@ const CONFIGS = {
     ],
   },
   board2: {
-    seed: 20260708,
-    secret: 'VALLETTA',
+    id: 'board2-jowisz-v4',
+    seed: 20260905,
+    secret: 'JOWISZ',
+    unlockWith: 'KSIEZNICZKA',
     words: [
-      ['VADUZ', 'Stolica Liechtensteinu'],
-      ['EVEREST', 'Dach świata'],
-      ['ETNA', 'Sycylijski wulkan'],
-      ['TYBER', 'Rzeka Rzymu'],
-      ['LIZBONA', 'Stolica z tramwajem 28'],
-      ['BALTYK', 'Nasze morze'],
-      ['ATLANTYK', 'Ocean po drodze do Ameryki'],
-      ['GOZO', 'Mała siostra Malty'],
-      ['TALLIN', 'Stolica Estonii'],
-      ['WENECJA', 'Miasto gondoli'],
-      ['LOARA', 'Francuska rzeka zamków'],
-      ['SAHARA', 'Piaski bez końca'],
-      ['ANDY', 'Góry z lamami'],
-      ['TATRY', 'Góry z Giewontem'],
-      ['MDINA', 'Cicha stolica Malty'],
-      ['PARYZ', 'Miasto zakochanych'],
-      ['RODOS', 'Wyspa kolosa'],
-      ['KORSYKA', 'Wyspa Napoleona'],
-      ['KRAKOW', 'Miasto smoka wawelskiego'],
-      ['FIORD', 'Norweska zatoka'],
+      ['TYGRYSEK', 'Kot z Węglisk'],
+      ['GOZO', 'Mini Malta'],
+      ['RAKI', 'Kreta: nie zamawialiśmy, ale wypiliśmy'],
+      ['GALAKTYKA', 'Miliardy gwiazd'],
+      ['MALEDIWY', 'Ulubiona wyspa'],
+      ['MAJORKA', 'Zwiedzona Audi'],
+      ['BESTIA', 'Czarne BMW'],
+      ['PILATES', 'Najcięższy trening'],
+      ['MASAŻ', 'Hotel i…'],
     ],
   },
 };
@@ -256,11 +247,12 @@ const fmtClues = clues.map((c) => `      { at: [${c.at[0]}, ${c.at[1]}], dir: '$
 const fmtSecret = secretCells.map((s) => `      { n: ${s.n}, at: [${s.at[0]}, ${s.at[1]}] },`).join('\n');
 console.log(`\n  // --- do wklejenia w src/app/boards.ts ---
   {
-    id: '${NAME}',
+    id: '${CONFIG.id ?? NAME}',
     title: 'Plansza nr ${NAME.replace('board', '')}',
     rows: ${rows},
     cols: ${cols},
-    secret: '${SECRET}',
+    secret: '${SECRET}',${CONFIG.unlockWith ? `
+    unlockWith: '${CONFIG.unlockWith}',` : ''}
     clues: [
 ${fmtClues}
     ],

@@ -11,15 +11,17 @@ async function sha256(text: string): Promise<string> {
 // To nie jest „prawdziwe" zabezpieczenie (kod jest publiczny), ale wystarcza na prezent.
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly HASH = 'd97b0df52b50f024e60b92c3294bb98179276ef4a9740b599cb60f9834b49825'; // = "kasia123"
-  private readonly KEY = 'kk_unlocked';
+  private readonly HASH = 'fb7bab9edf08f024aabf3501518399e82ab590666207a8b0ab7963b181ecf4b8';
 
-  readonly unlocked = signal(localStorage.getItem(this.KEY) === '1');
+  readonly unlocked = signal(false);
+
+  lock(): void {
+    this.unlocked.set(false);
+  }
 
   async verify(input: string): Promise<boolean> {
     const ok = (await sha256(input)) === this.HASH;
     if (ok) {
-      localStorage.setItem(this.KEY, '1');
       this.unlocked.set(true);
     }
     return ok;

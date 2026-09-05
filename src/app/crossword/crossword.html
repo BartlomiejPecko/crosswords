@@ -1,4 +1,40 @@
+@if (choosing()) {
+  <main class="collection">
+    <nav class="collection-nav"><span>♡ &nbsp; Krzyżówki dla Kasi</span><button class="ghost" (click)="auth.lock()">Zablokuj</button></nav>
+    <div class="board-cards">
+      @for (b of boards; track b.id; let i = $index) {
+        <button class="board-card" (click)="selectBoard(i)">
+          <div class="card-art" [class.second]="i % 2 === 1" aria-hidden="true">
+            <span class="edition">NR {{ i + 1 < 10 ? '0' : '' }}{{ i + 1 }}</span>
+            <div class="mini-grid">@for (square of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]; track square) {<span [class.blank]="[0,3,6,9,15,18,21,24].includes(square)"></span>}</div>
+            <span class="art-heart">♡</span>
+          </div>
+          <div class="card-copy">
+            <span class="availability">{{ isUnlocked(b) ? 'GOTOWA DO ODKRYCIA' : 'JESZCZE CHWILKA' }}</span>
+            <h2>{{ b.title }}</h2>
+            <p>{{ b.clues.length }} haseł · krzyżówka szwedzka</p>
+            <span class="card-cta">{{ isUnlocked(b) ? 'Otwórz krzyżówkę' : 'Odblokuj hasłem z pierwszej' }} <span aria-hidden="true">↗</span></span>
+          </div>
+        </button>
+      }
+    </div>
+    @if (pendingBoard() !== null) {
+      <form class="board-unlock" (submit)="unlockBoard($event, password.value)">
+        <label for="board-password">Hasło z pierwszej krzyżówki</label>
+        <input #password id="board-password" type="text" autocomplete="off" spellcheck="false" (input)="unlockError.set('')" aria-describedby="unlock-error" />
+        <p id="unlock-error" role="status">{{ unlockError() }}</p>
+        <div>
+          <button type="submit">Odblokuj</button>
+          <button type="button" class="ghost" (click)="pendingBoard.set(null)">Anuluj</button>
+        </div>
+      </form>
+    }
+    <p class="collection-message" role="status">{{ message() }}</p>
+  </main>
+} @else {
+<div class="game-shell">
 <header class="topbar">
+  <button class="ghost" (click)="choosing.set(true)">← Kolekcja</button>
   <h2 (click)="onTitleClick()">{{ message() || board.title }}</h2>
   <div class="tabs">
     @for (b of boards; track b.id; let i = $index) {
@@ -37,7 +73,7 @@
             <div class="cell clue" [class.two]="cell.clues.length > 1" (click)="onClueClick(cell)">
               @for (cl of cell.clues; track $index) {
                 <div class="clue-part" [class.dir-down]="cl.dir === 'down'" [class.dir-right]="cl.dir === 'right'">
-                  <span class="clue-text">{{ cl.text }}</span>
+                  <span class="clue-text" [class.long-clue]="cl.text.length > 30" [title]="cl.text">{{ cl.text }}</span>
                   <span class="arrow">{{ arrowGlyph(cl.dir) }}</span>
                 </div>
               }
@@ -73,6 +109,7 @@
     </div>
   </div>
 
+  <footer class="game-footer">
   <div class="secret">
     <span class="secret-label">Hasło</span>
     <div class="secret-bar">
@@ -84,11 +121,12 @@
       }
     </div>
   </div>
-</div>
-
 <div class="actions">
   <button type="button" class="check" (click)="check()">Sprawdź</button>
   <button type="button" class="ghost" (click)="clear()">Wyczyść</button>
+</div>
+  </footer>
+</div>
 </div>
 
 @if (solved()) {
@@ -104,4 +142,5 @@
       <button type="button" (click)="closeSuccess()">Zamknij</button>
     </div>
   </div>
+}
 }
